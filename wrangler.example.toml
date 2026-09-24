@@ -1,0 +1,62 @@
+# Copy to wrangler.toml and fill in your own values. wrangler.toml is gitignored.
+# Then provision secrets (see README):
+#   npx wrangler secret put PEPPER
+#   npx wrangler secret put VAPID_PRIVATE_KEY
+#   npx wrangler secret put VAPID_SUBJECT
+
+name = "bs-notify"
+main = "src/index.ts"
+account_id = "your-account-id"        # replace with your Cloudflare account id
+compatibility_date = "2026-09-01"
+compatibility_flags = ["nodejs_compat"]
+workers_dev = false
+preview_urls = false
+
+[assets]
+directory = "./public"
+binding = "ASSETS"
+run_worker_first = true
+
+# One KV namespace per binding; create them and paste the ids:
+#   npx wrangler kv namespace create ACCOUNTS
+#   npx wrangler kv namespace create SESSIONS
+#   npx wrangler kv namespace create TOPICS
+#   npx wrangler kv namespace create KEYS
+#   npx wrangler kv namespace create FEEDS
+[[kv_namespaces]]
+binding = "ACCOUNTS"
+id = "your-kv-namespace-id"
+
+[[kv_namespaces]]
+binding = "SESSIONS"
+id = "your-kv-namespace-id"
+
+[[kv_namespaces]]
+binding = "TOPICS"
+id = "your-kv-namespace-id"
+
+[[kv_namespaces]]
+binding = "KEYS"
+id = "your-kv-namespace-id"
+
+[[kv_namespaces]]
+binding = "FEEDS"
+id = "your-kv-namespace-id"
+
+[[durable_objects.bindings]]
+name = "HASHER"
+class_name = "Hasher"
+
+[[durable_objects.bindings]]
+name = "RATE_LIMITER"
+class_name = "RateLimiter"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["Hasher", "RateLimiter"]
+
+[vars]
+VAPID_PUBLIC_KEY = "your-cloudflare-vapid-public-key"   # from `npm run keys:generate`
+
+[observability]
+enabled = true

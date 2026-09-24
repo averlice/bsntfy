@@ -1,0 +1,14 @@
+export const acctKey = (acct: string) => `acct:${acct}`;
+export const sessKey = (sha: string) => `sess:${sha}`;
+export const sessIdxKey = (acct: string) => `sessidx:${acct}`;
+export const topicKey = (acct: string, name: string) => `topic:${acct}:${name}`;
+export const topicsIdxKey = (acct: string) => `topics:${acct}`;
+export const apikeyKey = (sha: string) => `apikey:${sha}`;
+export const apikeysIdxKey = (acct: string, topic: string) => `apikeys:${acct}:${topic}`;
+export const dtokKey = (sha: string) => `dtok:${sha}`;
+export const dtoksIdxKey = (acct: string) => `dtoks:${acct}`;
+export const pairCodeKey = (acct: string, hash: string) => `pair:${acct}:${hash}`;
+export const pairCodeActiveKey = (acct: string) => `pair:${acct}:active`;
+export const subKey = (acct: string, topic: string, id: string) => `sub:${acct}:${topic}:${id}`;
+export const subsIdxKey = (acct: string, topic: string) => `subs:${acct}:${topic}`;
+export const feedKey = (acct: string, topic: string) => `feed:${acct}:${topic}`;

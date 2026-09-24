@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Blindsoft Notify</title>
+  <link rel="stylesheet" href="/style.css?v=9">
+  <link rel="icon" href="data:,">
+</head>
+<body>
+  <main id="app"></main>
+  <template id="t-auth">
+    <section class="card auth">
+      <h1>Blindsoft Notify</h1>
+      <p class="muted">Push notifications for your topics.</p>
+      <div class="tabs">
+        <button class="tab" data-tab="login">Log in</button>
+        <button class="tab active" data-tab="register">Register</button>
+      </div>
+      <form id="auth-form">
+        <label id="acct-field">Account number
+          <input id="acct-num" name="accountNumber" inputmode="numeric" autocomplete="username" maxlength="10" readonly required>
+        </label>
+        <label>Password
+          <input name="password" type="password" autocomplete="current-password" minlength="12" maxlength="128" required>
+        </label>
+        <button type="submit" class="primary">Continue</button>
+        <p id="auth-msg" class="msg"></p>
+      </form>
+      <div id="reg-done" class="hidden">
+        <label>Your account number
+          <div class="row">
+            <input id="reg-acct" value="" readonly>
+            <button type="button" id="reg-copy" class="primary">Copy</button>
+          </div>
+        </label>
+        <p class="muted">Write this down — you need it to log in.</p>
+        <button type="button" id="reg-continue" class="primary">Continue</button>
+        <p id="reg-done-msg" class="msg"></p>
+      </div>
+    </section>
+  </template>
+  <template id="t-dash">
+    <header class="topbar">
+      <span class="brand">BS Notify</span>
+      <span id="acct-label" class="muted"></span>
+      <span class="spacer"></span>
+      <a class="ghost link" href="https://github.com/averlice/bsntfy" target="_blank" rel="noopener">GitHub</a>
+      <button id="show-pass" class="ghost">Change password</button>
+      <button id="logout" class="ghost">Log out</button>
+    </header>
+    <div id="password-panel" class="card hidden">
+      <h3>Change password</h3>
+      <form id="password-form" class="row">
+        <input name="oldPassword" type="password" placeholder="Current password" required>
+        <input name="newPassword" type="password" placeholder="New password (12+)" minlength="12" required>
+        <button type="submit" class="primary">Update</button>
+      </form>
+      <p id="pass-msg" class="msg"></p>
+    </div>
+    <div id="view"></div>
+    <section class="card danger-zone">
+      <h3>Danger zone</h3>
+      <p class="muted">Permanently delete your account and all topics, API keys, subscribers, and device tokens.</p>
+      <form id="delete-acct-form" class="row">
+        <input name="password" type="password" placeholder="Current password" required>
+        <button type="submit" class="danger">Delete account</button>
+      </form>
+      <p id="delete-acct-msg" class="msg"></p>
+    </section>
+  </template>
+  <template id="t-devices">
+    <section class="card">
+      <div class="row between">
+        <h3>Device tokens</h3>
+        <button id="new-device" class="primary">New token</button>
+      </div>
+      <p class="muted">Tokens your app uses to subscribe to topics and receive pushes. They expire after 30 days — use <em>Pair an app</em> to sign back in.</p>
+      <form id="device-form" class="hidden col">
+        <input name="label" placeholder="label, e.g. Pixel 9" maxlength="60">
+        <select name="scope">
+          <option value="push">push — subscribe &amp; receive only</option>
+          <option value="manage">manage — push + manage topics &amp; keys</option>
+        </select>
+        <button class="primary" type="submit">Create token</button>
+      </form>
+      <ul id="device-list" class="list"></ul>
+      <details>
+        <summary>Pair an app</summary>
+        <p class="muted">Generate a one-time 6-digit code. Enter it in the app together with your account number to sign in — no password needed.</p>
+        <div class="row">
+          <button id="gen-pair" class="primary">Generate code</button>
+          <span id="pair-code" class="kbd hidden"></span>
+          <span id="pair-exp" class="muted"></span>
+        </div>
+        <p id="pair-msg" class="msg"></p>
+      </details>
+    </section>
+  </template>
+  <template id="t-topic">
+    <section class="card">
+      <div class="row between">
+        <h3>Topics</h3>
+        <form id="new-topic" class="row">
+          <input name="name" placeholder="topic-name" maxlength="32" required pattern="[a-z0-9][a-z0-9_-]{1,31}">
+          <button class="primary" type="submit">Create</button>
+        </form>
+      </div>
+      <ul id="topic-list" class="list"></ul>
+    </section>
+  </template>
+  <template id="t-detail">
+    <button class="back ghost" id="back">&larr; Topics</button>
+    <section class="card">
+      <h3>/<span id="d-name"></span></h3>
+      <form id="publish-form" class="col">
+        <textarea name="message" rows="2" maxlength="4096" placeholder="Message to publish to this topic" required></textarea>
+        <button class="primary" type="submit">Publish</button>
+      </form>
+      <p id="publish-msg" class="msg"></p>
+      <details>
+        <summary>Publish from anywhere (curl)</summary>
+        <pre id="curl-help"></pre>
+      </details>
+    </section>
+    <section class="card">
+      <h3>Feed</h3>
+      <ul id="feed-list" class="list"></ul>
+    </section>
+    <section class="card">
+      <h3>API keys</h3>
+      <form id="key-form" class="row">
+        <input name="label" placeholder="label" maxlength="60">
+        <select name="perms">
+          <option value="write">write</option>
+          <option value="read">read</option>
+          <option value="readwrite">read+write</option>
+        </select>
+        <button class="primary" type="submit">Create key</button>
+      </form>
+      <p class="muted">Keys are shown once. Publish with <code>Authorization: Bearer &lt;key&gt;</code>.</p>
+      <ul id="key-list" class="list"></ul>
+    </section>
+    <section class="card">
+      <h3>Subscribers</h3>
+      <ul id="sub-list" class="list"></ul>
+    </section>
+    <section class="card danger-zone">
+      <h3>Delete topic</h3>
+      <p class="muted">Removes the topic, its API keys, subscribers, and feed. This cannot be undone.</p>
+      <button id="delete-topic-btn" class="danger">Delete this topic</button>
+      <p id="delete-topic-msg" class="msg"></p>
+    </section>
+  </template>
+  <template id="t-modal">
+    <div class="modal-backdrop">
+      <div class="card modal">
+        <h3 id="modal-title"></h3>
+        <div class="row">
+          <input id="modal-value" value="" readonly>
+          <button type="button" id="modal-copy" class="primary">Copy</button>
+        </div>
+        <p class="muted" id="modal-note"></p>
+        <button type="button" id="modal-close" class="ghost">Done</button>
+      </div>
+    </div>
+  </template>
+  <script src="/app.js?v=9" defer></script>
+</body>
+</html>
